@@ -1,0 +1,103 @@
+<% @title = "Hello!" %>
+
+<div class="sidebar layout">
+
+	<div class="group-info layout">
+
+		<h3>Popular Groups</h3>
+
+		<% @groups.each do |group| %>
+
+		<a href="/group/<%= group.id %>">
+			<%= group.name %>
+		</a> <br />
+
+		<% end %>	
+
+	</div>
+
+</div>
+
+<div class="main layout">
+
+	<h1>Users in the <%= @group.name %> group</h1>
+
+	<hr />
+
+	<form method="POST" action="#">
+		<input type="hidden" name="follower_id" value="<%= current_user.id %>">
+		<input type="hidden" name="group_id" value="<%= @group.id %>">
+		<input type="hidden" name="followed_group_name" value="<%= @group.name %>">
+		<button type="submit" class="btn btn-primary">Follow Group</button>
+	</form>
+
+	<br />
+	<hr />
+
+	<% @users.sort_by { |key| key[:username] }.each do |user| %>
+
+		<div class="twizzle layout">
+
+			<div class="twizzle-user-wrapper layout">
+
+				<div class="twizzle-image layout">
+					<a href="/profile/<%= user.id %>">
+						<% if File.exist?('public/uploads/' + user.username + '.jpg') %>
+						<img src="/uploads/<%= user.username %>.jpg" class="twizzle-follower-image"/>
+						<% else %>
+						<img src="/uploads/empty.jpg" class="twizzle-follower-image"/>
+						<% end %>
+					</a>	
+				</div>
+				<div class="twizzle-heading layout">
+					<a href="/profile/<%= user.id %>">
+						<strong>
+							<%= user.full_name %>
+						</strong>	
+					</a>
+					<a href="/profile/<%= user.id %>">	
+						@<%= user.username %>
+					</a>	
+				</div>
+				<div class="twizzle-content layout">
+					<%= user.headline %>
+				</div>
+
+			</div><!-- /twizzle-user-wrapper -->
+
+			<div class="user-follow-form-wrapper layout">
+
+				<% if session[:session_user_id] %>
+
+					<% if current_user.following.include?user %>
+
+				<form method="POST" action="/unfollow">
+					<input type="hidden" name="follower_id" value="<%= session[:session_user_id] %>">
+					<input type="hidden" name="followed_id" value="<%= user.id %>">
+					<input type="hidden" name="followed_username" value="<%= user.username %>">
+					<button type="submit" class="btn btn-primary">Unfollow</button>
+				</form>
+
+					<% else %>
+
+				<form method="POST" action="/follow">
+					<input type="hidden" name="follower_id" value="<%= session[:session_user_id] %>">
+					<input type="hidden" name="followed_id" value="<%= user.id %>">
+					<input type="hidden" name="followed_username" value="@<%= user.username %>">
+					<button type="submit" class="btn btn-primary">Follow</button>
+				</form>
+
+					<% end %>
+
+			</div><!-- /form-wrapper -->
+
+				<% end %>
+
+		</div>
+
+		<hr />
+
+	<% end %>
+
+</div><!-- /main -->
+

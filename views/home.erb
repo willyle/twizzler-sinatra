@@ -1,0 +1,133 @@
+	<% @title = "Welcome To Twizzler" %>
+
+<div class="sidebar layout">
+	<div class="user-info layout">
+		<a href="/profile/<%= @user.id %>">
+			<% if File.exist?('public/uploads/' + @user.username + '.jpg') %>
+			<img src="/uploads/<%= @user.username %>.jpg" class="user-image"/>
+			<% else %>
+			<img src="/uploads/empty.jpg" class="user-image"/>
+			<% end %>
+		</a>	
+		<p>
+			<a href="/profile/<%= @user.id %>">
+				<h3>@<%= @user.username %></h3>
+			</a>	
+		</p>
+
+		<div class="user-stats layout">
+			<p class="layout"><a href="/profile/<%= @user.id %>">Twizzles</a> <span><a href="/profile/<%= @user.id %>"><%= @twizzles.count %></a></span></p>
+			<p class="layout"><a href="/followers/<%= @user.id %>">Followers</a> <span><a href="/followers/<%= @user.id %>"><%= @followers.count %></a></span></p>
+			<p class="layout"><a href="/following/<%= @user.id %>">Following</a> <span><a href="/following/<%= @user.id %>"><%= @following.count %></a></span></p>
+		</div><!-- user-stats -->
+
+	</div><!-- user-info -->
+
+	<hr />
+
+	<a href="/profile/<%= @user.id %>">
+		<button type="button" class="btn btn-primary">My Profile</button>
+	</a>	
+
+	<a href="/settings/<%= @user.id %>">
+		<button type="button" class="btn btn-primary pull-right">My Settings</button>
+	</a>
+
+</div><!-- sidebar -->
+
+<div class="main layout">
+
+	<h2>New Twizzle</h2>
+
+	<form method="POST" action="/new-twizzle">
+		<textarea class="twizzle-textarea" name="twizzle_content"></textarea>
+		<input type="hidden" name="user_id" value ="<%= session[:session_user_id] %>" />
+		<br />
+		<p>
+			<span class="character-count">150</span> characters remaining
+		</p>
+		<button type="submit" class="btn btn-primary">Twizzle</button>
+	</form>
+
+	<h2>My Feed</h2>
+
+	<hr />
+
+	<% @feed.sort_by { |key| key[:updated_at] }.reverse!.each do |twizzle| %>
+
+		<div class="twizzle layout">
+
+			<div class="twizzle-user-wrapper layout">
+
+				<div class="twizzle-image layout">
+					<a href="/profile/<%= twizzle.user_id %>">
+						<% if File.exist?('public/uploads/' + twizzle.username + '.jpg') %>
+						<img src="/uploads/<%= twizzle.username %>.jpg" class="twizzle-follower-image"/>
+						<% else %>
+						<img src="/uploads/empty.jpg" class="twizzle-follower-image"/>
+						<% end %>
+					</a>	
+				</div><!-- /twizzle-image -->
+
+				<div class="twizzle-heading layout">
+					<a href="/profile/<%= twizzle.user_id %>">
+						<strong>
+							<%= twizzle.full_name %>
+						</strong>	
+					</a>	
+					<a href="/profile/<%= twizzle.user_id %>">
+						@<%= twizzle.username %>
+					</a> - 
+					<%= twizzle.updated_at.to_time.strftime("%b %e,  %Y at %l:%M%p") %>
+				</div><!-- /twizzle-heading -->
+
+				<div class="twizzle-content layout">
+					<%= twizzle.content %>
+				</div><!-- /twizzle-content -->
+
+			</div><!-- /twizzle-user-wrapper -->
+
+			<div class="user-follow-form-wrapper layout">
+
+	<%	
+		# - - - - - - - - - - - - - - - - - - - - - -
+		# Check to see if this Twizzle is mine.
+		# If the Twizzle is mine, display the "delete"
+		# button. If the Twizzle is not mine, display 
+		# the "unfollow" button.
+		# - - - - - - - - - - - - - - - - - - - - - - 
+	%>
+
+	<% if current_user.id == twizzle.user_id %>
+
+				<form method="POST" action="/delete-twizzle">
+					<input type="hidden" name="twizzle_id" value="<%= twizzle.id %>">
+					<button type="submit" class="btn btn-primary">Delete</button>
+				</form>
+
+	<% else %>
+
+				<form method="POST" action="/unfollow">
+					<input type="hidden" name="follower_id" value="<%= session[:session_user_id] %>">
+					<input type="hidden" name="followed_id" value="<%= twizzle.user_id %>">
+					<input type="hidden" name="followed_username" value="<%= twizzle.username %>">
+					<button type="submit" class="btn btn-primary">Unfollow</button>
+				</form>
+
+	<% end %>
+
+			</div><!-- /form-wrapper -->
+
+		</div><!-- /twizzle -->
+
+		<hr />
+
+	<% end %>
+
+	<%	
+		# - - - - - - - - - - - - - - - - - - - - - -
+		# Finished looping through feed.
+		# - - - - - - - - - - - - - - - - - - - - - - 
+	%>
+
+</div>

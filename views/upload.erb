@@ -1,0 +1,10 @@
+	<% @title = "Upload" %>
+
+	<h1>Upload File</h1>
+
+	<form method="POST" enctype="multipart/form-data" action="/upload">
+		<label for="file">Username</label>
+		<input type="file" name="file">
+		<input type="hidden" name="username" value="<%= @user.username %>">
+		<input type="submit">
+	</form>

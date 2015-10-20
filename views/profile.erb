@@ -1,0 +1,135 @@
+<% @title = "Hello " + @user.username + "!" %>
+
+<div class="sidebar layout">
+	<div class="user-info layout">
+		<a href="/profile/<%= @user.id %>">
+			<% if File.exist?('public/uploads/' + @user.username + '.jpg') %>
+			<img src="/uploads/<%= @user.username %>.jpg" class="user-image"/>
+			<% else %>
+			<img src="/uploads/empty.jpg" class="user-image"/>
+			<% end %>
+		</a>	
+		<p>
+			<a href="/profile/<%= @user.id %>">
+				<h3>@<%= @user.username %></h3>
+			</a>	
+		</p>
+		<div class="user-stats layout">
+			<p class="layout"><a href="/profile/<%= @user.id %>">Twizzles</a> <span><a href="/profile/<%= @user.id %>"><%= @twizzles.count %></a></span></p>
+			<p class="layout"><a href="/followers/<%= @user.id %>">Followers</a> <span><a href="/followers/<%= @user.id %>"><%= @followers.count %></a></span></p>
+			<p class="layout"><a href="/following/<%= @user.id %>">Following</a> <span><a href="/following/<%= @user.id %>"><%= @following.count %></a></span></p>
+		</div>
+	</div>
+
+
+	<%	
+		# - - - - - - - - - - - - - - - - - - - - - -
+		# Check to see if I am following this user.
+		# If I am following this user, display the
+		# "unfollow" button. Next, check to see if the 
+		# profile is my profile. If it is my profile,
+		# display the "settings" button. Otherwise,
+		# display the "follow" button.
+		# - - - - - - - - - - - - - - - - - - - - - - 
+	%>
+
+	<% if current_user.following.include?@user %>
+
+		<form method="POST" action="/unfollow">
+			<input type="hidden" name="follower_id" value="<%= session[:session_user_id] %>">
+			<input type="hidden" name="followed_id" value="<%= @user.id %>">
+			<hr />
+			<button type="submit" class="btn btn-primary">Unfollow</button>
+		</form>
+
+	<% elsif current_user.id == @user.id %>
+
+		<hr />
+
+		<a href="/settings/<%= current_user.id %>">
+			<button type="submit" class="btn btn-primary">Settings</button>
+		</a>	
+
+	<% else %>
+
+		<form method="POST" action="/follow">
+			<input type="hidden" name="follower_id" value="<%= session[:session_user_id] %>">
+			<input type="hidden" name="followed_id" value="<%= @user.id %>">
+			<input type="hidden" name="followed_username" value="@<%= @user.username %>">
+			<hr />
+			<button type="submit" class="btn btn-primary">Follow</button>
+		</form>
+
+	<% end %>
+
+</div>
+
+<div class="main layout">
+
+	<h3>
+		Twizzles by <a href="/profile/<%= @user.id %>">@<%= @user.username %></a>
+	</h3>
+
+	<%	
+		# - - - - - - - - - - - - - - - - - - - - - -
+		# Loop through the Twizzles for this user.
+		# Check to see if the user has a profile picture.
+		# If there is a profile picture, display the 
+		# profile picture. If not, display the default 
+		# picture. Convert the timestamp from the database
+		# into a readable time. If this is my profile, display
+		# a delete button next to my Twizzles.
+		# - - - - - - - - - - - - - - - - - - - - - - 
+	%>
+
+	<% @twizzles.sort_by { |key| key[:updated_at] }.reverse!.each do |twizzle| %>
+
+		<div class="twizzle layout">
+
+			<div class="twizzle-user-wrapper layout">
+
+					<div class="twizzle-image layout">
+						<a href="/profile/<%= @user.id %>">
+							<% if File.exist?('public/uploads/' + twizzle.username + '.jpg') %>
+							<img src="/uploads/<%= twizzle.username %>.jpg" class="twizzle-follower-image"/>
+							<% else %>
+							<img src="/uploads/empty.jpg" class="twizzle-follower-image"/>
+							<% end %>
+						</a>	
+					</div><!-- /twizzle-image -->
+
+					<div class="twizzle-heading layout">
+						<a href="/profile/<%= @user.id %>">
+							<strong>
+								<%= twizzle.full_name %>
+							</strong>	
+						</a>
+						<a href="/profile/<%= @user.id %>">
+							@<%= twizzle.username %>
+						</a> - 
+						<%= twizzle.updated_at.to_time.strftime("%b %e,  %Y at %l:%M%p") %>
+					</div><!-- /twizzle-heading -->
+
+					<div class="twizzle-content layout">
+						<%= twizzle.content %>
+					</div><!-- /twizzle-content -->
+
+
+			</div><!-- /twizzle-user-wrapper -->
+
+			<div class="user-follow-form-wrapper layout">
+
+				<form method="POST" action="/delete-twizzle">
+					<input type="hidden" name="twizzle_id" value="<%= twizzle.id %>">
+					<button type="submit" class="btn btn-primary">Delete</button>
+				</form>
+
+			</div><!-- /form-wrapper -->
+
+		</div><!-- /twizzle -->
+
+
+		<hr />
+	<% end %>
+
+</div><!-- /main -->

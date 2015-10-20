@@ -1,0 +1,59 @@
+	<% @title = "Edit Your Profile" %>
+
+	<h1>Update Your Profile</h1>
+
+	<form method="POST" action="/settings">
+		<div class="form-group">
+			<label for="username">Username</label>
+			<input type="text" name="username" value="<%= @user.username %>" class="form-control">
+		</div>		
+		<div class="form-group">
+			<label for="fname">First Name</label>
+			<input type="text" name="fname" value="<%= @user.fname %>" class="form-control">
+		</div>	
+		<div class="form-group">
+			<label for="lname">Last Name</label>
+			<input type="text" name="lname" value="<%= @user.lname %>" class="form-control">
+		</div>	
+		<div class="form-group">	
+			<label for="password">Password</label>
+			<input type="password" name="password" value="<%= @user.password %>" class="form-control">
+		</div>	
+		<div class="form-group">
+			<label for="email">Email</label>		
+			<input type="text" name="email" value="<%= @user.email %>" class="form-control">
+		</div>	
+		<div class="form-group">
+			<label for="password">Headline</label>
+			<input type="text" name="headline" value="<%= @user.headline %>" class="form-control">
+		</div>	
+		<input type="hidden" name="user_id" value="<%= @user.id %>">
+		<button type="submit" class="btn btn-primary">Edit Profile</button>
+	</form>
+
+	<hr />
+
+	<h1>Update Profile Picture</h1>
+
+	<form method="POST" enctype="multipart/form-data" action="/upload">
+		<div class="form-group">
+			<label for="file">Upload a picture from your computer</label>
+			<input type="file" name="file">
+		</div>	
+		<input type="hidden" name="username" value="<%= @user.username %>">
+		<button type="submit" class="btn btn-primary">Edit Picture</button>
+	</form>
+
+	<hr />
+
+	<h1>Delete your profile</h1>
+
+	<form method="POST" enctype="multipart/form-data" action="/delete-profile">
+		<p>Deleting your profile is irreversible. Please type your password to delete your profile.</p>
+		<div class="form-group">	
+			<label for="password">Password</label>
+			<input type="password" name="password" value="" class="form-control">
+		</div>	
+		<input type="hidden" name="user_id" value="<%= @user.id %>">
+		<button type="submit" class="btn btn-danger">Delete Profile</button>
+	</form>

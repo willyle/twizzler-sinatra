@@ -1,0 +1,203 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title><%= @title %></title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/css/style.css" />
+
+</head>
+
+<body>
+
+<header>
+	<nav class="layout">
+		<ul class="nav nav-left layout">
+
+			<li>
+				<a href="/">
+					Home
+				</a>	
+			</li>
+
+			<li>
+				<a href="/users">
+					Users
+				</a>	
+			</li>
+
+	<% if !session[:session_user_id] %>
+
+			<li>
+				<a href="/login">
+					Login
+				</a>	
+			</li>
+
+			<li>
+				<a href="/signup">
+					Sign Up
+				</a>	
+			</li>
+
+	<% end %>
+
+		</ul>
+
+	<% if session[:session_user_id] %>
+
+		<ul class="nav nav-right layout">
+
+			<% if File.exist?('public/uploads/' + current_user.username + '.jpg') %>
+
+			<li><a href="/profile/<%= current_user.id %>"><img src="/uploads/<%= current_user.username %>.jpg" class="user-image-header"/></a></li>
+
+			<% else %>
+
+			<li><a href="/profile/<%= current_user.id %>"><img src="/uploads/empty.jpg" class="user-image-header"/></a></li>
+			<% end %>
+
+			<li>
+				<a href="#twizzleModal" role="button" data-toggle="modal">
+					New Twizzle
+				</a>	
+			</li>
+
+			<li>
+				<a href="/profile/<%= current_user.id %>">
+					My Profile
+				</a>	
+			</li>
+
+			<li>
+				<a href="/settings/<%= session[:session_user_id] %>">
+					Settings
+				</a>	
+			</li>
+
+			<li>
+				<a href="/logout">
+					Logout
+				</a>	
+			</li>
+
+		</ul>
+
+	<% end %>
+
+		</nav>
+</header>
+
+
+<div class="wrapper layout">
+
+	<hr />
+
+	<!-- start yielding the content of our view -->
+	<%= yield %>	
+	<!-- end yielding the content of our view -->
+
+
+
+	
+
+
+
+
+
+	<!-- start New Twizzle Modal -->
+
+			  <div class="modal fade" id="twizzleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			    <div class="modal-dialog">
+			      <div class="modal-content">
+			        <div class="modal-header">
+			          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			          <h4 class="modal-title">New Twizzle</h4>
+			        </div>
+			        <div class="modal-body">
+
+						<!-- start New Twizzle Form -->
+
+						<form method="POST" action="/new-twizzle">
+							<textarea class="twizzle-textarea" name="twizzle_content"></textarea>
+							<input type="hidden" name="user_id" value ="<%= session[:session_user_id] %>" />
+							<br />
+							<p>
+								<span class="character-count">150</span> characters remaining
+							</p>
+							<button type="submit" class="btn btn-primary">Twizzle</button>
+						</form>
+
+						<!-- end New Twizzle Form -->
+
+			        </div>
+			        <div class="modal-footer">
+			          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        </div>
+			      </div><!-- /.modal-content -->
+			    </div><!-- /.modal-dialog -->
+			  </div><!-- /.modal -->
+
+	<!-- end New Twizzle Modal -->
+
+	<!-- start flash messaging -->
+	<% if flash[:notice] %>
+			  <div class="modal fade flashModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			    <div class="modal-dialog">
+			      <div class="modal-content">
+			        <div class="modal-header">
+			          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			          <h4 class="modal-title">Good News!</h4>
+			        </div>
+			        <div class="modal-body">
+			          <%=flash[:notice] %>
+			        </div>
+			        <div class="modal-footer">
+			          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        </div>
+			      </div><!-- /.modal-content -->
+			    </div><!-- /.modal-dialog -->
+			  </div><!-- /.modal -->
+			
+
+	<% end %>
+	<% if flash[:alert] %>
+			  <div class="modal fade flashModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			    <div class="modal-dialog">
+			      <div class="modal-content">
+			        <div class="modal-header">
+			          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			          <h4 class="modal-title">Bad News!</h4>
+			        </div>
+			        <div class="modal-body">
+			          <%=flash[:alert] %>
+			        </div>
+			        <div class="modal-footer">
+			          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        </div>
+			      </div><!-- /.modal-content -->
+			    </div><!-- /.modal-dialog -->
+			  </div><!-- /.modal -->
+
+	<% end %>
+	<!-- end flash messaging -->
+
+</div><!-- /wrapper -->
+
+<footer class="layout">
+	<hr />
+	<% if session[:session_user_id] %>
+		You are logged in as: <%= session[:session_username] %><br />
+		Your ID is: <%= session[:session_user_id] %>
+	<% end %>
+</footer>
+
+
+
+	<script src="/js/vendor/jquery-2.1.4/jquery-2.1.4.min.js"></script>
+	<script src="/js/vendor/bootstrap-3.3.5/bootstrap.min.js"></script>
+	<script src="/js/vendor/character.limit/limit.js"></script>
+	<script src="/js/app.js"></script>
+</body>
+</html>
